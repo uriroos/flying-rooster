@@ -1,0 +1,20 @@
+/// <reference path="../../../../typings/tsd.d.ts" />
+
+// Angular Service - Events
+(function() {
+
+    'use strict';
+
+    angular.module('app.services.event', [])
+		.service('EventService', function() {
+			
+            // Start listening on current window
+			this.listen = function(name, cb) {
+                
+                window.addEventListener(name, function(data) {
+                    // Callback with optional data
+                    cb(data);
+                }, false);
+            }
+        });
+})();

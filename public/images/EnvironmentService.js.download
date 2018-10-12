@@ -1,0 +1,123 @@
+/// <reference path="../../../../typings/tsd.d.ts" />
+
+// Angular Service
+(function() {
+
+    'use strict';
+
+    angular.module('app.services.environment', [])
+		.service('EnvironmentService', function($timeout, $rootScope, $http, $window) {
+
+            // Private
+            var self = this;
+            var _mode = null;
+            var _parent = null;
+            var _parent_scope = null;
+            var _active_id = null;
+
+            // Public API | Environment
+            Object.defineProperty(this, "Mode", {
+                get: function () { return _mode; },
+                set: function (mode) { _mode = mode; }
+            });
+
+            // Public API | Active block
+            Object.defineProperty(this, "ActiveId", {
+                get: function () { return _active_id; },
+                set: function (active_id) { _active_id = active_id; }
+            });
+
+            var iframed = true;
+
+            // Public API | Initialize
+            this.init = function(scope) {
+                if(!scope) return iframed = false;
+
+                _parent_scope = scope;
+                _parent = _parent_scope.$parent.PromotionsDetail;
+            };
+
+            if(!iframed) return console.warn('BrandBox Editor not found.');
+
+            // ActiveContent on Parent Scope
+            this.activate = function(id, ctrl, model, type, data) {
+
+                if(!_parent_scope) return console.warn('No Angular Parent found.');
+
+                $timeout(function() {
+
+                    // Set Active ID
+                    _active_id = id;
+
+                    // Apply to parent Scope
+                    _parent_scope.$apply(function() {
+
+                        _parent.ActiveContent.activate(id, ctrl, model, type, data);
+                    });
+
+                });
+            };
+
+            // Sync the Block to the Database
+            this.sync = function(id, language, settings) {
+
+                //console.log("SETTINGS", settings);
+
+                // if(!_parent_scope) return console.warn('No Angular Parent found.');
+
+                // $timeout(function() {
+
+                //     // Set Active ID
+                //     _active_id = id;
+
+                //     // Apply to parent Scope
+                //     _parent_scope.$apply(function() {
+
+                //         _parent.ActiveContent.save(id, language, settings);
+                //     });
+
+                // });
+
+                // Save to Database
+                $http.post('/admin/tile-language/update/format/json', {
+                    appblock_id: parseInt(id),
+                    language: language,
+                    settings: settings
+                }).then(function() {
+                    // TODO: GIVE FEEDBACK
+                    // console.log("DONE SYNCING");
+                });
+
+            };
+
+            // Pre compiler for JSON strings (currently retrieved from PHP backend)
+            this.compilePreModel = function(str) {
+                if(!str) return console.warn('Invalid pre-model');
+
+                //console.log(JSON.parse(str));
+                return JSON.parse(str);
+            };
+
+            // Deactivate Element
+            this.deactivate = function() {
+
+                // Reset Active ID
+                _active_id = null;
+
+                _parent && _parent.ActiveContent.deactivate();
+            };
+
+            // Public API | Apply
+            this.apply = function(id, language, model) {
+
+                // Apply changes to parent
+                _parent_scope.$apply(function() {
+
+                    // Update parent Model from current Component Model
+                    _parent.ActiveContent.model = model;
+                    self.sync(id, language, model);
+                });
+            };
+
+        });
+})();

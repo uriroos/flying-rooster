@@ -1,0 +1,64 @@
+@charset "UTF-8";
+
+@font-face {
+  font-family: "blocks";
+  src:url("fonts/blocks.eot");
+  src:url("fonts/blocks.eot?#iefix") format("embedded-opentype"),
+    url("fonts/blocks.woff") format("woff"),
+    url("fonts/blocks.ttf") format("truetype"),
+    url("fonts/blocks.svg#blocks") format("svg");
+  font-weight: normal;
+  font-style: normal;
+
+}
+
+[data-icon]:before {
+  font-family: "blocks" !important;
+  content: attr(data-icon);
+  font-style: normal !important;
+  font-weight: normal !important;
+  font-variant: normal !important;
+  text-transform: none !important;
+  speak: none;
+  line-height: 1;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+[class^="icon-"]:before,
+[class*=" icon-"]:before {
+  font-family: "blocks" !important;
+  font-style: normal !important;
+  font-weight: normal !important;
+  font-variant: normal !important;
+  text-transform: none !important;
+  speak: none;
+  line-height: 1;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+.icon-trash-bin:before {
+  content: "a";
+}
+.icon-down-bold:before {
+  content: "b";
+}
+.icon-up-bold:before {
+  content: "c";
+}
+.icon-heart:before {
+  content: "d";
+}
+.icon-comment:before {
+  content: "e";
+}
+.icon-cw:before {
+  content: "f";
+}
+.icon-reorder:before {
+  content: "i";
+}
+.icon-align-justify:before {
+  content: "g";
+}

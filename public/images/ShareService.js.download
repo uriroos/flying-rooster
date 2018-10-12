@@ -1,0 +1,75 @@
+/// <reference path="../../../../typings/tsd.d.ts" />
+
+// Angular Service - Shares
+(function() {
+
+    'use strict';
+
+    angular.module('app.services.share', ['app.services.answer'])
+		.service('ShareService', function($http, AnswerService) {
+			
+			var self = this;
+
+            // Start listening on current window
+			this.shareFacebook = function(post) {
+                
+                // Check if FB is available
+				if(!FB) return console.warn("FB is not defined");
+
+				// Check for post object
+				if(!post) return console.warn("Post is not defined");
+
+				// Sanitize description
+				post.description = this.stripTags(post.description);
+
+				post.site = "facebook";
+
+                var fb_options = {
+                    method: 'feed',
+                    name: post.name,
+                    link: post.link,
+                    caption: post.caption,
+                    description: post.description
+                };
+
+                // Only send picture if it's not empty
+                if(post.picture){
+                    // Check for image protocol
+                    var pat = /^https?:\/\//i;
+
+                    if (!pat.test(post.picture)) fb_options.picture = window.location.protocol + post.picture;
+
+                }
+
+                FB.ui(fb_options, function(res){
+                	if (res && res.post_id) {
+				        self.save(post);
+				    } else {
+				        console.warn("Post was not published");
+				    }
+                	
+                });
+            };
+
+            // Start listening on current window
+			this.shareTwitter = function(post) {
+				post.site = 'twitter';
+                self.save(post);
+            };
+
+            this.save = function(post){
+
+            	// Store share in database
+                if(!post.appblock_id) return console.warn("No appblock id has been defined");
+
+                if(!post.site) return console.warn("No medium has been defined");
+
+                AnswerService.save(post);
+            };
+
+            this.stripTags = function(text) {
+					return  text ? String(text).replace(/<[^>]+>/gm, '') : '';
+			};
+
+        });
+})();

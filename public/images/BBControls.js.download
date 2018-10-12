@@ -1,0 +1,95 @@
+(function() {
+
+    "use strict";
+    
+    var BBControlsCtrl = function($attrs, $scope, $rootScope, $timeout, EnvironmentService){
+
+        var self = this;
+        var ctrl = 'BBControls';
+
+        this.model = null;
+    
+        this.$scope = $scope;
+        this.$scope.active_id = EnvironmentService.ActiveId;
+
+        this.allowBubble = false;
+        this.id = $attrs.id;
+
+        this.isActive = function(){
+
+            if(EnvironmentService.ActiveId == self.id) return true;
+
+            return false;
+        };
+
+        this.deactivate = function(){
+            EnvironmentService.deactivate();    
+        };
+
+        this.activate = function(){
+
+            // If it's already active, do nothing
+            if(self.isActive()) return;
+
+            // Trigger clickBubble, for example for the Text block
+            if(self.clickBubble){
+                
+                self.allowBubble = true;
+
+                return $timeout(function(){
+                    // Prevent mouse clicks
+                    angular.element('#' + $attrs.id).css('pointer-events','none');
+                    angular.element('#' + self.clickBubble).triggerHandler('click');
+                });
+                
+            }
+
+            // For 'ordinary' blocks, active the block
+            EnvironmentService.activate(self.id, ctrl, self.model, null, null);    
+                
+        };
+
+    };
+
+    angular.module('app.controls', [])
+        .component('bbControls', {
+            
+            // Component Options
+            bindings: {
+                clickBubble: '@',
+                openSidebar: '<'
+            },
+            controller: BBControlsCtrl,
+            controllerAs: 'BBControls',
+            templateUrl: '/js/angular/app/components/bb-controls/bb-controls.html',
+        }).directive("anyOtherClick", ['$document', "$parse", function ($document, $parse) {
+            return {
+                restrict: 'A',
+                link:  function (scope, element, attr, controller) {
+
+                    var anyOtherClickFunction = $parse(attr["anyOtherClick"]);
+                    var documentClickHandler = function (event) {
+
+                        var eventOutsideTarget = (element[0] !== event.target) && (0 === element.find(event.target).length);
+
+                        if (eventOutsideTarget){
+
+                            scope.$apply(function () {
+                                anyOtherClickFunction(scope, {});
+                            });
+
+                        }
+                        
+                    };
+
+                    $document.on("click", documentClickHandler);
+
+                    scope.$on("$destroy", function () {
+                        $document.off("click", documentClickHandler);
+                    });
+
+                },
+            };
+        }]);
+
+})();

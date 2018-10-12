@@ -1,0 +1,43 @@
+bb-controls {
+    position: absolute;
+    z-index: 99999;
+    width: 100%;
+    height: 100%;
+    left: 0;
+    cursor: pointer;
+}
+
+bb-controls .hit-area {
+    height: 100%;
+    outline: none;
+}
+
+bb-controls .allow-bubble {
+    pointer-events: none;
+}
+
+bb-controls .hit-area.active {
+    background: rgba(0, 0, 0, 0.1);
+    box-shadow: inset 0 0 0 2px #48c2c5;
+}
+
+bb-controls .md-button {
+    display: inline-block;
+    width: 38px;
+    min-width: 0;
+}
+
+bb-controls md-icon {
+    background: #000;
+    color: #fff;
+}
+
+bb-controls .fade.ng-leave {
+    transition: 0.5s linear all;
+    opacity: 1;
+}
+
+bb-controls .fade.ng-leave.ng-leave-active {
+    opacity: 0;
+}
+

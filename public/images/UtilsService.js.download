@@ -1,0 +1,66 @@
+/// <reference path="../../../../typings/tsd.d.ts" />
+
+// Angular Service - Utils
+(function() {
+
+    'use strict';
+
+    angular.module('app.services.utils', [])
+		.service('UtilsService', function($window, $compile) {
+
+            
+        })
+        .directive('bbMq', function($window) {
+
+            var mediaQueries = {
+                'mobile': '(max-width: 579px)',
+                'gt-mobile': '(min-width: 580px)',
+
+                'tablet': '(min-width: 580px) and (max-width: 767px)',
+                'gt-tablet': '(min-width: 768px)',
+
+                'computer': '(min-width: 768px) and (max-width: 1059px)',
+                'gt-computer': '(min-width: 1060px)',
+
+                'computer-xl': '(min-width: 1060px)',
+            };
+
+            function queryMedia(queries, element) {
+                for (var cssClass in queries) {
+                    var mql = queries[cssClass];
+                    if (mql.matches) {
+                        element.addClass(cssClass);
+                    } else {
+                        element.removeClass(cssClass);
+                    }
+                }
+            }
+
+            function link(scope, element, attrs) {
+
+                var mediaClass = scope.$eval(attrs.mqClass);
+
+                if (!angular.isObject(mediaClass)) throw "media-class is not set to an object with css and media query definitions";
+
+                var queries = {};
+
+                for (var cssClass in mediaClass) {
+
+                    var query = mediaClass[cssClass];
+                    query = mediaQueries[query] || query;
+
+                    var mql = $window.matchMedia(query);
+                    if (mql.media == "not all" && query != "not all") throw query + " is not a valid media query";
+
+                    queries[cssClass] = mql;
+                    mql.addListener(function() { queryMedia(queries, element) });
+                }
+                queryMedia(queries, element);
+            }
+
+            return {
+                restrict: 'A',
+                link: link
+            }
+        });
+})();
